@@ -46,6 +46,8 @@ jobs:
         with:
           php-version: '8.2'
           extensions: mbstring, pdo_mysql
+      - name: Install Composer dependencies
+        run: composer install --no-interaction --prefer-dist
       - name: Run PHPUnit tests
         run: vendor/bin/phpunit --testdox
 
