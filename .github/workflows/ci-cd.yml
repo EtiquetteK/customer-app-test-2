@@ -73,18 +73,19 @@ jobs:
       - name: Install Heroku CLI
         run: curl https://cli-assets.heroku.com/install.sh | sh
 
-      - name: Authenticate with Heroku
+      - name: Deploy to Green environment
         env:
           HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
-        run: echo "$HEROKU_API_KEY" | heroku auth:token
-
-      - name: Deploy to Green environment
         run: |
           heroku git:remote -a customers-green
           git push heroku main
 
       - name: Smoke test Green deployment
+        env:
+          HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
         run: curl -f https://customers-green.herokuapp.com/customers.php
 
       - name: Promote Green to Production (Blue-Green switch)
+        env:
+          HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
         run: heroku pipelines:promote --app customers-green
