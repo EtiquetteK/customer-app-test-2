@@ -46,7 +46,46 @@ if ($databaseUrl !== false) {
 try {
     $pdo = new PDO($dsn, $dbUser, $dbPass, $options);
 
-    $stmt = $pdo->prepare("SELECT id, name, email, created_at FROM customer");
+    // Detect database type and create table if not exists
+    if ($scheme === 'postgres' || $scheme === 'pgsql') {
+        // PostgreSQL table creation
+        $pdo->exec("CREATE TABLE IF NOT EXISTS customer (
+            id SERIAL PRIMARY KEY,
+            name VARCHAR(255) NOT NULL,
+            email VARCHAR(255) NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )");
+        
+        // Insert sample data if table is empty
+        $checkStmt = $pdo->query("SELECT COUNT(*) as count FROM customer");
+        $count = $checkStmt->fetch()['count'];
+        if ($count == 0) {
+            $pdo->exec("INSERT INTO customer (name, email) VALUES 
+                ('John Doe', 'john@example.com'),
+                ('Jane Smith', 'jane@example.com'),
+                ('Bob Johnson', 'bob@example.com')");
+        }
+    } else {
+        // MySQL table creation
+        $pdo->exec("CREATE TABLE IF NOT EXISTS customer (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            name VARCHAR(255) NOT NULL,
+            email VARCHAR(255) NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )");
+        
+        // Insert sample data if table is empty
+        $checkStmt = $pdo->query("SELECT COUNT(*) as count FROM customer");
+        $count = $checkStmt->fetch()['count'];
+        if ($count == 0) {
+            $pdo->exec("INSERT INTO customer (name, email) VALUES 
+                ('John Doe', 'john@example.com'),
+                ('Jane Smith', 'jane@example.com'),
+                ('Bob Johnson', 'bob@example.com')");
+        }
+    }
+
+    $stmt = $pdo->prepare("SELECT id, name, email, created_at FROM customer ORDER BY created_at DESC");
     $stmt->execute();
     $customers = $stmt->fetchAll();
 
