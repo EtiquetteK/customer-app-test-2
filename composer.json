@@ -2,7 +2,9 @@
   "name": "yourname/customers-app",
   "description": "PHP Customers app with CI/CD pipeline",
   "type": "project",
-  "require": {},
+  "require": {
+    "php": "^8.2"
+  },
   "require-dev": {
     "phpunit/phpunit": "^10.0"
   },
