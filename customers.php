@@ -1,17 +1,50 @@
 <?php
-$host = 'localhost';
-$db   = 'userdb';
-$user = 'root';
-$pass = '';
-$charset = 'utf8mb4';
+$defaultHost = 'localhost';
+$defaultDb   = 'userdb';
+$defaultUser = 'root';
+$defaultPass = '';
+$defaultCharset = 'utf8mb4';
 
-$dsn = "mysql:host=$host;dbname=$db;charset=$charset";
+$databaseUrl = getenv('DATABASE_URL');
+
+if ($databaseUrl !== false) {
+    $parsed = parse_url($databaseUrl);
+
+    if ($parsed === false || !isset($parsed['scheme'])) {
+        die('Invalid DATABASE_URL environment variable');
+    }
+
+    $scheme = $parsed['scheme'];
+    if ($scheme === 'postgres' || $scheme === 'pgsql') {
+        $dbHost = $parsed['host'] ?? $defaultHost;
+        $dbPort = $parsed['port'] ?? 5432;
+        $dbName = ltrim($parsed['path'] ?? '', '/');
+        $dbUser = $parsed['user'] ?? '';
+        $dbPass = $parsed['pass'] ?? '';
+
+        $dsn = "pgsql:host={$dbHost};port={$dbPort};dbname={$dbName}";
+        $options = [
+            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+        ];
+    } else {
+        die('Unsupported DATABASE_URL scheme: ' . htmlspecialchars($scheme));
+    }
+} else {
+    $dbHost = $defaultHost;
+    $dbName = $defaultDb;
+    $dbUser = $defaultUser;
+    $dbPass = $defaultPass;
+    $charset = $defaultCharset;
+    $dsn = "mysql:host={$dbHost};dbname={$dbName};charset={$charset}";
+    $options = [
+        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+    ];
+}
 
 try {
-    $pdo = new PDO($dsn, $user, $pass, [
-        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC
-    ]);
+    $pdo = new PDO($dsn, $dbUser, $dbPass, $options);
 
     $stmt = $pdo->prepare("SELECT id, name, email, created_at FROM customer");
     $stmt->execute();
