@@ -18,7 +18,7 @@ jobs:
           extensions: mbstring, pdo_mysql
 
       - name: Install Composer dependencies
-        run: composer install --no-interaction --prefer-dist
+        run: composer install --no-interaction --prefer-source
 
       - name: Lint PHP files
         run: find . -type f -name "*.php" -exec php -l {} \;
@@ -47,7 +47,7 @@ jobs:
           php-version: '8.2'
           extensions: mbstring, pdo_mysql
       - name: Install Composer dependencies
-        run: composer install --no-interaction --prefer-dist
+        run: composer install --no-interaction --prefer-source
       - name: Run PHPUnit tests
         run: vendor/bin/phpunit --testdox
 
