@@ -11,8 +11,11 @@ $mysqlCharset = 'utf8mb4';
 // PostgreSQL connection from environment
 $databaseUrl = getenv('DATABASE_URL');
 
-// Parse DATABASE_URL and handle password properly
-if ($databaseUrl) {
+// Check if we're running locally or on Heroku
+$isLocal = empty($databaseUrl);
+
+if (!$isLocal) {
+    // Parse DATABASE_URL for Heroku
     $parsed = parse_url($databaseUrl);
     $postgresHost = $parsed['host'] ?? 'localhost';
     $postgresPort = $parsed['port'] ?? 5432;
@@ -20,20 +23,48 @@ if ($databaseUrl) {
     $postgresUser = $parsed['user'] ?? '';
     $postgresPass = !empty($parsed['pass']) ? urldecode($parsed['pass']) : '';
 } else {
-    // Default local PostgreSQL
-    $postgresHost = 'localhost';
-    $postgresPort = 5432;
-    $postgresDb = 'customer_db';
-    $postgresUser = 'postgres';
-    $postgresPass = '';
+    // Local environment - PostgreSQL not available
+    $isLocal = true; // Set flag for later use
 }
 
 echo "========================================\n";
 echo "Customer Database Migration Tool\n";
 echo "========================================\n\n";
 
-// Step 1: Connect to MySQL
-echo "[1] Connecting to MySQL...\n";
+if ($isLocal) {
+    echo "📍 LOCAL ENVIRONMENT DETECTED\n\n";
+    echo "This script is designed for Heroku PostgreSQL migration.\n";
+    echo "For local development:\n";
+    echo "1. MySQL tables are auto-created by customers.php\n";
+    echo "2. Use 'php sync-to-heroku.php' to transfer data to Heroku\n\n";
+    echo "✓ MySQL setup check...\n";
+
+    // Just check MySQL connection and table
+    try {
+        $dsn = "mysql:host=$mysqlHost;dbname=$mysqlDb;charset=$mysqlCharset";
+        $mysql = new PDO($dsn, $mysqlUser, $mysqlPass, [
+            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC
+        ]);
+        echo "✓ MySQL connected successfully\n";
+
+        // Check if table exists and has data
+        $stmt = $mysql->query("SELECT COUNT(*) as count FROM customer");
+        $count = $stmt->fetch()['count'];
+        echo "✓ Customer table exists with $count records\n\n";
+
+        echo "🎯 To migrate data to Heroku, run:\n";
+        echo "   php sync-to-heroku.php\n";
+
+    } catch (PDOException $e) {
+        echo "✗ MySQL connection failed: " . $e->getMessage() . "\n";
+        echo "\n💡 Make sure XAMPP MySQL is running\n";
+    }
+
+    exit(0);
+}
+
+echo "🌐 HEROKU ENVIRONMENT DETECTED\n\n";
 try {
     $dsn = "mysql:host=$mysqlHost;dbname=$mysqlDb;charset=$mysqlCharset";
     $mysql = new PDO($dsn, $mysqlUser, $mysqlPass, [

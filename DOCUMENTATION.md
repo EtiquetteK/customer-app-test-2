@@ -62,9 +62,9 @@ $databaseUrl = getenv('DATABASE_URL'); // Heroku provides this
 ```
 
 ### 2. **migrate.php** (Database Migration)
-- Creates database schema on first run
-- Handles table structure for both MySQL and PostgreSQL
-- Prepared for data migration tasks
+- **Local Environment:** Checks MySQL setup and provides migration instructions
+- **Heroku Environment:** Creates database schema and migrates data from MySQL to PostgreSQL
+- Environment-aware script that behaves differently based on context
 
 ### 3. **import.php** (Data Import Endpoint)
 - API endpoint that accepts POST requests with customer data
