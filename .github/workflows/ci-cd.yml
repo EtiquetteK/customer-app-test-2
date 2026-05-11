@@ -49,7 +49,7 @@ jobs:
       - name: Install Composer dependencies
         run: composer install --no-interaction --prefer-source
       - name: Run PHPUnit tests
-        run: vendor/bin/phpunit --testdox
+        run: vendor/bin/phpunit tests/ --testdox
 
   security:
     runs-on: ubuntu-latest
