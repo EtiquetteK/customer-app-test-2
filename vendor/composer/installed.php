@@ -3,7 +3,7 @@
         'name' => 'yourname/customers-app',
         'pretty_version' => 'dev-main',
         'version' => 'dev-main',
-        'reference' => '9cadda2301c0587ee433e27a0922670f62946ebb',
+        'reference' => '5dd816d88c7147f896c6bcf627589edd76cbbd46',
         'type' => 'project',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -247,7 +247,7 @@
         'yourname/customers-app' => array(
             'pretty_version' => 'dev-main',
             'version' => 'dev-main',
-            'reference' => '9cadda2301c0587ee433e27a0922670f62946ebb',
+            'reference' => '5dd816d88c7147f896c6bcf627589edd76cbbd46',
             'type' => 'project',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
