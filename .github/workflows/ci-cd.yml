@@ -63,9 +63,6 @@ jobs:
           path: '.'
           format: 'HTML'
           out: 'reports'
-        with:
-          project: "customers-app"
-          scan: "."
 
   deploy:
     runs-on: ubuntu-latest
