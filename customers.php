@@ -85,7 +85,7 @@ try {
         }
     }
 
-    $stmt = $pdo->prepare("SELECT id, name, email, created_at FROM customer ORDER BY created_at DESC");
+    $stmt = $pdo->prepare("SELECT id, name, email, created_at FROM customer ORDER BY created_at ASC");
     $stmt->execute();
     $customers = $stmt->fetchAll();
 
