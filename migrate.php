@@ -6,10 +6,13 @@ if (empty($mysqlData)) {
     try {
         $postgres->beginTransaction();
         
-        // Use ON CONFLICT to skip duplicates
+        // Use ON CONFLICT to update existing rows
         $stmt = $postgres->prepare("INSERT INTO customer (id, name, email, created_at) 
                                      VALUES (?, ?, ?, ?)
-                                     ON CONFLICT (id) DO NOTHING");
+                                     ON CONFLICT (id) DO UPDATE 
+                                     SET name = EXCLUDED.name,
+                                         email = EXCLUDED.email,
+                                         created_at = EXCLUDED.created_at");
         
         $count = 0;
         foreach ($mysqlData as $row) {
@@ -23,7 +26,7 @@ if (empty($mysqlData)) {
         }
         
         $postgres->commit();
-        echo "✓ Successfully migrated $count records (duplicates skipped)\n\n";
+        echo "✓ Successfully migrated/updated $count records\n\n";
     } catch (PDOException $e) {
         $postgres->rollBack();
         die("✗ Migration failed: " . $e->getMessage() . "\n");
